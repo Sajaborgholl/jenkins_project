@@ -8,36 +8,30 @@ pipeline {
             steps {
                 script {
                     // Create the virtual environment
-                    sh "python -m venv ${VIRTUAL_ENV}"
+                    bat "python -m venv ${VIRTUAL_ENV}"
 
-                    // Activate the virtual environment and install dependencies
-                    if (isUnix()) {
-                        sh "source ${VIRTUAL_ENV}/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"
-                    } else {
-                        bat "call ${VIRTUAL_ENV}\\Scripts\\activate && pip install --upgrade pip && pip install -r requirements.txt"
-                    }
+                    // Upgrade pip and install dependencies
+                    bat """
+                    call ${VIRTUAL_ENV}\\Scripts\\activate
+                    python -m pip install --upgrade pip
+                    pip install -r requirements.txt
+                    """
                 }
             }
         }
         stage('Lint') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh "source ${VIRTUAL_ENV}/bin/activate && flake8 app.py"
-                    } else {
-                        bat "call ${VIRTUAL_ENV}\\Scripts\\activate && flake8 app.py"
-                    }
+                    // Activate the virtual environment and run flake8
+                    bat "call ${VIRTUAL_ENV}\\Scripts\\activate && flake8 app.py"
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    if (isUnix()) {
-                        sh "source ${VIRTUAL_ENV}/bin/activate && pytest"
-                    } else {
-                        bat "call ${VIRTUAL_ENV}\\Scripts\\activate && pytest"
-                    }
+                    // Activate the virtual environment and run pytest
+                    bat "call ${VIRTUAL_ENV}\\Scripts\\activate && pytest"
                 }
             }
         }
