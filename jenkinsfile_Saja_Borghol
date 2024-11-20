@@ -35,6 +35,19 @@ pipeline {
                 }
             }
         }
+        stage('Coverage') {
+            steps {
+                script {
+                    // Activate the virtual environment and run coverage
+                    bat """
+                    call ${VIRTUAL_ENV}\\Scripts\\activate
+                    coverage run -m pytest
+                    coverage report
+                    coverage html
+                    """
+                }
+            }
+        }
         stage('Deploy') {
             steps {
                 script {
