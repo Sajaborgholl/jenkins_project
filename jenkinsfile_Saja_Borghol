@@ -7,31 +7,43 @@ pipeline {
         stage('Setup') {
             steps {
                 script {
-                    if (!fileExists("${env.WORKSPACE}/${VIRTUAL_ENV}")) {
-                        sh "python -m venv ${VIRTUAL_ENV}"
+                    // Create the virtual environment
+                    sh "python -m venv ${VIRTUAL_ENV}"
+
+                    // Activate the virtual environment and install dependencies
+                    if (isUnix()) {
+                        sh "source ${VIRTUAL_ENV}/bin/activate && pip install --upgrade pip && pip install -r requirements.txt"
+                    } else {
+                        bat "call ${VIRTUAL_ENV}\\Scripts\\activate && pip install --upgrade pip && pip install -r requirements.txt"
                     }
-                    sh "source ${VIRTUAL_ENV}/bin/activate && pip install -r requirements.txt"
                 }
             }
         }
         stage('Lint') {
             steps {
                 script {
-                    sh "source ${VIRTUAL_ENV}/bin/activate && flake8 app.py"
+                    if (isUnix()) {
+                        sh "source ${VIRTUAL_ENV}/bin/activate && flake8 app.py"
+                    } else {
+                        bat "call ${VIRTUAL_ENV}\\Scripts\\activate && flake8 app.py"
+                    }
                 }
             }
         }
         stage('Test') {
             steps {
                 script {
-                    sh "source ${VIRTUAL_ENV}/bin/activate && pytest"
+                    if (isUnix()) {
+                        sh "source ${VIRTUAL_ENV}/bin/activate && pytest"
+                    } else {
+                        bat "call ${VIRTUAL_ENV}\\Scripts\\activate && pytest"
+                    }
                 }
             }
         }
         stage('Deploy') {
             steps {
                 script {
-                    // Deployment logic, e.g., pushing to a remote server
                     echo "Deploying application..."
                 }
             }
