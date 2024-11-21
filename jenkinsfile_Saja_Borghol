@@ -62,7 +62,15 @@ pipeline {
         stage('Deploy') {
             steps {
                 script {
-                    echo "Deploying application..."
+                    // Define the target deployment directory
+                    def deploymentDir = 'C:\\DeployedApp'
+
+                    // Copy application files to the deployment directory
+                    bat """
+                    if not exist ${deploymentDir} mkdir ${deploymentDir}
+                    xcopy /E /Y *.* ${deploymentDir}\\
+                    """
+                    echo "Application deployed to ${deploymentDir}"
                 }
             }
         }
